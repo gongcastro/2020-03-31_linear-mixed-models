@@ -1337,7 +1337,7 @@ flip_slope2 <- flip_data %>%
         axis.text = element_text (colour = "black", family = "Helvetica"),
         legend.position = "none")
 
-ggsave(plot = flip_slope2, here("flip_slopes2.png"), height = 5.5, width = 7)
+ggsave(plot = flip_slope2, here("img", "flip_slopes2.png"), height = 5.5, width = 7)
 
 include_graphics("img/flip_slopes2.png")
 
