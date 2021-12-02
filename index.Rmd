@@ -9,8 +9,8 @@ output:
       highlightLines: true
       countIncrementalSlides: false
       ratio: '16:9'
-css: "custom.css"
-bibliography: "references.bib"
+css: "css/custom.css"
+bibliography: "bib/references.bib"
 ---
 
 class: center, middle, section
@@ -19,8 +19,8 @@ class: center, middle, section
 
 Gonzalo García-Castro
 
-[![](../img/github.png)](https://github.com/gongcastro)
-[![](../img/twitter.png)](https://twitter.com/gongcastro)
+[![](img/github.png)](https://github.com/gongcastro)
+[![](img/twitter.png)](https://twitter.com/gongcastro)
 
 <br><br>
 
@@ -87,7 +87,7 @@ Probably, none of us will ever be
 So let's get to it!
 
 .pull-right-normal[
-![](../img/meme_noidea.gif)
+![](img/meme_noidea.gif)
 ]
 
 ???
@@ -113,7 +113,7 @@ Yay! You have made so much progress.
 We need to learn a bit about programming.
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, out.width="40%", paged.print=FALSE}
-include_graphics("../img/meme_honest.jpg")
+include_graphics("img/meme_honest.jpg")
 ```
 
 ---
@@ -122,7 +122,7 @@ include_graphics("../img/meme_honest.jpg")
 Most statistical literature on LMM uses **R** (e.g., `lmer()` function of the `lme4` package)
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE, out.width="40%"}
-include_graphics("../img/meme_lmer.jpg")
+include_graphics("img/meme_lmer.jpg")
 ```
 
 ---
@@ -316,7 +316,7 @@ This formula underlies most statistical techinques we use normally:
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE, out.width="25%"}
 
-include_graphics("../img/meme_glm.jpg")
+include_graphics("img/meme_glm.jpg")
 
 ```
 
@@ -328,7 +328,7 @@ class: center
 Most of them are generalised or special cases of the the **GLM**.
 
 .centered[
-[![](../img/linear_models.png)](https://lindeloev.github.io/tests-as-linear/)
+[![](img/linear_models.png)](https://lindeloev.github.io/tests-as-linear/)
 ]
 
 ---
@@ -474,7 +474,7 @@ ggsave(plot = distribution_plot, here("img", "distribution.png"), height = 5, wi
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, out.width="100%", paged.print=FALSE}
 
-include_graphics("../img/distribution.png")
+include_graphics("img/distribution.png")
 
 ```
 
@@ -496,7 +496,7 @@ This means that the **probability** of one observation taking one value is indep
 
 ```{r balls, echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE, out.width="30%"}
 
-include_graphics("../img/balls.jpg")
+include_graphics("img/balls.jpg")
 
 ```
 
@@ -693,7 +693,7 @@ head(task_data, 10) %>%
 Data-points from all participants are pooled together:
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE, outwidth="40%"}
-include_graphics("../img/task_plot_fix.png")
+include_graphics("img/task_plot_fix.png")
 ```
 
 ---
@@ -703,7 +703,7 @@ Assumption of non-indenpendence is had to assume here.
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE, outwidth="40%"}
 
-include_graphics("../img/task_plot_fix_points.png")
+include_graphics("img/task_plot_fix_points.png")
 
 ```
 
@@ -725,7 +725,7 @@ task_data %>%
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE, outwidth="50%"}
 
-include_graphics("../img/task_plot_fix_agg.png")
+include_graphics("img/task_plot_fix_agg.png")
 
 ```
 
@@ -745,7 +745,7 @@ head(task_data, 10) %>%
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE, outwidth="50%"}
 
-include_graphics("../img/task_plot_int.png")
+include_graphics("img/task_plot_int.png")
 
 ```
 
@@ -754,7 +754,7 @@ include_graphics("../img/task_plot_int.png")
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE, outwidth="70%"}
 
-include_graphics("../img/task_plot_slo.png")
+include_graphics("img/task_plot_slo.png")
 
 ```
 
@@ -805,7 +805,7 @@ We use their **preferential looking** behaviour (how long infants turn their hea
 If infants **look systematically** longer to one set of stimuli than to others, it means that they are able to **discriminate** between them.
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE, out.width="40%"}
-include_graphics("../img/setup.png")
+include_graphics("img/setup.png")
 ```
 
 ---
@@ -1004,7 +1004,7 @@ flip_plot_fixed <-  ggplot(data = flip_data, aes(x = Item, y = LookingTime)) +
 
 ggsave(here("img", "flip_fixed.png"), height = 3, width = 8)
 
-include_graphics("../img/flip_fixed.png")
+include_graphics("img/flip_fixed.png")
 
 ```
 
@@ -1086,7 +1086,7 @@ Several alternatives:
 ---
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE, out.width="40%"}
-include_graphics("../img/meme_bayes.jpg")
+include_graphics("img/meme_bayes.jpg")
 ```
 
 ---
@@ -1128,7 +1128,7 @@ flip_inter <- ggplot(data = flip_data, aes(x = Item, y = LookingTime, colour = P
 
 ggsave(plot = flip_inter, here("img", "flip_inter.png"), height = 3, width = 7)
 
-include_graphics("../img/flip_inter.png")
+include_graphics("img/flip_inter.png")
 
 ```
 
@@ -1189,7 +1189,7 @@ The model fails to converge (i.e., can't find the most likely coefficients given
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE, out.width="50%"}
 
-include_graphics("../img/meme_convergence2.png")
+include_graphics("img/meme_convergence2.png")
 
 ```
 
@@ -1271,7 +1271,7 @@ flip_slope <- flip_data %>%
 
 ggsave(plot = flip_slope, here("img", "flip_slopes.png"), height = 5, width = 7)
 
-include_graphics("../img/flip_slopes.png")
+include_graphics("img/flip_slopes.png")
 
 ```
 
@@ -1339,7 +1339,7 @@ flip_slope2 <- flip_data %>%
 
 ggsave(plot = flip_slope2, here("flip_slopes2.png"), height = 5.5, width = 7)
 
-include_graphics("../img/flip_slopes2.png")
+include_graphics("img/flip_slopes2.png")
 
 ```
 
@@ -1350,7 +1350,7 @@ However, we missed something in the `lmer` output...
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE, out.width="50%"}
 
-include_graphics("../img/meme_singular.jpg")
+include_graphics("img/meme_singular.jpg")
 
 ```
 
@@ -1391,7 +1391,7 @@ They may be **correlated**.
 ---
 ```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE, outwidth="70%"}
 
-include_graphics("../img/task_plot_slo.png")
+include_graphics("img/task_plot_slo.png")
 
 ```
 
@@ -1402,7 +1402,7 @@ include_graphics("../img/task_plot_slo.png")
 > Studies where participants looked longer on average may be those where participants discriminated better between familiar and novel trials.
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE, out.width="50%"}
-include_graphics("../img/flip_slopes2.png")
+include_graphics("img/flip_slopes2.png")
 ```
 
 ---
@@ -1570,7 +1570,7 @@ flip_coefs <- anova %>%
 
 ggsave(plot = flip_coefs, here("img", "flip_coefs.png"), height = 5, width = 7)
 
-include_graphics("../img/flip_coefs.png")
+include_graphics("img/flip_coefs.png")
 ```
 
 ---
