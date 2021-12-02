@@ -6,7 +6,7 @@
     <script src="libs/header-attrs/header-attrs.js"></script>
     <link href="libs/remark-css/default.css" rel="stylesheet" />
     <link href="libs/remark-css/default-fonts.css" rel="stylesheet" />
-    <link rel="stylesheet" href="custom.css" type="text/css" />
+    <link rel="stylesheet" href="css/custom.css" type="text/css" />
   </head>
   <body>
     <textarea id="source">
@@ -18,8 +18,8 @@ class: center, middle, section
 
 Gonzalo García-Castro
 
-[![](../img/github.png)](https://github.com/gongcastro)
-[![](../img/twitter.png)](https://twitter.com/gongcastro)
+[![](img/github.png)](https://github.com/gongcastro)
+[![](img/twitter.png)](https://twitter.com/gongcastro)
 
 &lt;br&gt;&lt;br&gt;
 
@@ -52,7 +52,7 @@ Probably, none of us will ever be
 So let's get to it!
 
 .pull-right-normal[
-![](../img/meme_noidea.gif)
+![](img/meme_noidea.gif)
 ]
 
 ???
@@ -77,14 +77,14 @@ Yay! You have made so much progress.
 
 We need to learn a bit about programming.
 
-&lt;img src="../img/meme_honest.jpg" width="40%" /&gt;
+&lt;img src="img/meme_honest.jpg" width="40%" /&gt;
 
 ---
 ## Disclaimer (bonus 2)
 
 Most statistical literature on LMM uses **R** (e.g., `lmer()` function of the `lme4` package)
 
-&lt;img src="../img/meme_lmer.jpg" width="40%" /&gt;
+&lt;img src="img/meme_lmer.jpg" width="40%" /&gt;
 
 ---
 ## Disclaimer (bonus 2)
@@ -275,7 +275,7 @@ $$
 
 This formula underlies most statistical techinques we use normally:
 
-&lt;img src="../img/meme_glm.jpg" width="25%" /&gt;
+&lt;img src="img/meme_glm.jpg" width="25%" /&gt;
 
 ---
 class: center
@@ -285,7 +285,7 @@ class: center
 Most of them are generalised or special cases of the the **GLM**.
 
 .centered[
-[![](../img/linear_models.png)](https://lindeloev.github.io/tests-as-linear/)
+[![](img/linear_models.png)](https://lindeloev.github.io/tests-as-linear/)
 ]
 
 ---
@@ -399,7 +399,7 @@ It tells us the **probability** of each value of our coefficient, **assuming tha
 
 
 
-&lt;img src="../img/distribution.png" width="100%" /&gt;
+&lt;img src="img/distribution.png" width="100%" /&gt;
 
 ---
 ## Modelling: 3) Statistical inference
@@ -417,7 +417,7 @@ We assume many things, one of the, being that observations are independent from 
 
 This means that the **probability** of one observation taking one value is independent from the value other observations have taken.
 
-&lt;img src="../img/balls.jpg" width="30%" /&gt;
+&lt;img src="img/balls.jpg" width="30%" /&gt;
 
 
 ---
@@ -541,14 +541,14 @@ Trial-wise data:
 
 Data-points from all participants are pooled together:
 
-&lt;img src="../img/task_plot_fix.png" width="100%" /&gt;
+&lt;img src="img/task_plot_fix.png" width="100%" /&gt;
 
 ---
 ## Why to use a LMM
 
 Assumption of non-indenpendence is had to assume here.
 
-&lt;img src="../img/task_plot_fix_points.png" width="100%" /&gt;
+&lt;img src="img/task_plot_fix_points.png" width="100%" /&gt;
 
 ---
 ## Why to use a LMM
@@ -618,7 +618,7 @@ Assumption of non-indenpendence is had to assume here.
 ---
 ## Why to use a LMM
 
-&lt;img src="../img/task_plot_fix_agg.png" width="100%" /&gt;
+&lt;img src="img/task_plot_fix_agg.png" width="100%" /&gt;
 
 ---
 ## Why to use a LMM
@@ -701,12 +701,12 @@ There is another way of dealing with no independence and *not* losing data.
 ---
 ## Why to use a LMM
 
-&lt;img src="../img/task_plot_int.png" width="100%" /&gt;
+&lt;img src="img/task_plot_int.png" width="100%" /&gt;
 
 ---
 ## Why to use a LMM
 
-&lt;img src="../img/task_plot_slo.png" width="100%" /&gt;
+&lt;img src="img/task_plot_slo.png" width="100%" /&gt;
 
 
 ---
@@ -754,7 +754,7 @@ We use their **preferential looking** behaviour (how long infants turn their hea
 
 If infants **look systematically** longer to one set of stimuli than to others, it means that they are able to **discriminate** between them.
 
-&lt;img src="../img/setup.png" width="40%" /&gt;
+&lt;img src="img/setup.png" width="40%" /&gt;
 
 ---
 ### The data
@@ -963,7 +963,7 @@ summary_fixed$coefficients
 ---
 ### Only fixed effects: Model interpretation
 
-&lt;img src="../img/flip_fixed.png" width="100%" /&gt;
+&lt;img src="img/flip_fixed.png" width="100%" /&gt;
 
 ---
 ### Introducing random effects
@@ -1070,7 +1070,7 @@ Several alternatives:
 
 ---
 
-&lt;img src="../img/meme_bayes.jpg" width="40%" /&gt;
+&lt;img src="img/meme_bayes.jpg" width="40%" /&gt;
 
 ---
 ### Random intercepts by participant: Statistical inference
@@ -1125,7 +1125,7 @@ Anova(model_random, type = "III", test.statistic = "F")
 
 ### Random effects by participant: Model interpretation
 
-&lt;img src="../img/flip_inter.png" width="50%" /&gt;
+&lt;img src="img/flip_inter.png" width="50%" /&gt;
 
 ---
 ### Introducing random slopes
@@ -1184,7 +1184,7 @@ The model fails to converge (i.e., can't find the most likely coefficients given
 
 ---
 
-&lt;img src="../img/meme_convergence2.png" width="50%" /&gt;
+&lt;img src="img/meme_convergence2.png" width="50%" /&gt;
 
 ---
 ### Random intercepts and item slopes by participants: Model fitting
@@ -1274,7 +1274,7 @@ model_random_intercepts2 &lt;- lmer(formula = LookingTime ~ Item*HPP + (1 | Part
 ---
 ### Random intercepts by participant and by study: Model interpretation
 
-&lt;img src="../img/flip_slopes.png" width="50%" /&gt;
+&lt;img src="img/flip_slopes.png" width="50%" /&gt;
 
 ---
 ### Introducing random slopes by study
@@ -1352,14 +1352,14 @@ model_random_slope2 &lt;- lmer(formula = LookingTime ~ Item*HPP + (1 | Participa
 ---
 ### Random intercepts by participant and study, and random `Item` slopes by study: Model interpretation
 
-&lt;img src="../img/flip_slopes2.png" width="100%" /&gt;
+&lt;img src="img/flip_slopes2.png" width="100%" /&gt;
 
 ---
 ### Random intercepts by participant and study, and random `Item` slopes by study: Model interpretation
 
 However, we missed something in the `lmer` output...
 
-&lt;img src="../img/meme_singular.jpg" width="50%" /&gt;
+&lt;img src="img/meme_singular.jpg" width="50%" /&gt;
 
 ---
 ### Random intercepts by participant and study, and random `HPP` slopes by study: Model interpretation
@@ -1396,7 +1396,7 @@ They may be **correlated**.
 &gt; Participants that were **slower** in our lexical decission task may be **more sensitive** to the frequency manipulation.
 
 ---
-&lt;img src="../img/task_plot_slo.png" width="100%" /&gt;
+&lt;img src="img/task_plot_slo.png" width="100%" /&gt;
 
 
 ---
@@ -1404,7 +1404,7 @@ They may be **correlated**.
 
 &gt; Studies where participants looked longer on average may be those where participants discriminated better between familiar and novel trials.
 
-&lt;img src="../img/flip_slopes2.png" width="50%" /&gt;
+&lt;img src="img/flip_slopes2.png" width="50%" /&gt;
 
 ---
 ### (Parenthesis: Introducing the correlation parameter)
@@ -1552,7 +1552,7 @@ Accounts for:
 ---
 ### Random intercepts by participant: Statistical inference
 
-&lt;img src="../img/flip_coefs.png" width="50%" /&gt;
+&lt;img src="img/flip_coefs.png" width="50%" /&gt;
 
 ---
 class: section, center, middle
