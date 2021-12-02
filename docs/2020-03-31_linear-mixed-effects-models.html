@@ -1,0 +1,1730 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>A primer on Mixed-Effects Models: Theory and practice</title>
+    <meta charset="utf-8" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <link href="libs/remark-css/default.css" rel="stylesheet" />
+    <link href="libs/remark-css/default-fonts.css" rel="stylesheet" />
+    <link rel="stylesheet" href="custom.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+
+
+class: center, middle, section
+
+## A primer on Mixed-Effects Models:&lt;br&gt;Theory and practice
+
+Gonzalo García-Castro
+
+[![](../img/github.png)](https://github.com/gongcastro)
+[![](../img/twitter.png)](https://twitter.com/gongcastro)
+
+&lt;br&gt;&lt;br&gt;
+
+25th March 2020
+
+---
+class: center, middle, section
+
+
+
+
+
+
+# First of all...
+
+---
+# Disclaimer
+
+I'm not a trained statistician
+
+Don't trust me (too much)
+
+Mistakes may (will) be made
+
+I'm not 100% sure about anything
+
+Probably, none of us will ever be
+
+
+So let's get to it!
+
+.pull-right-normal[
+![](../img/meme_noidea.gif)
+]
+
+???
+
+Sometimes we need to get fancy to get the most out of out (little and precious) data
+
+---
+# Notation
+
+.centered[Linear Mixed-Effects Models = LMM]
+
+**Mixed Models** (aka. Mixed-Effects Models, aka. Multilevel Models, aka. Hierarchical Models, aka. Nested Data Models, aka. Random Parameter Models, aka. Split-Plot Designs)
+
+&lt;br&gt;
+
+If by the end of this presentation you have an intuition about why all **these labels refer to the same thing**
+
+Yay! You have made so much progress.
+
+---
+## Disclaimer (bonus 1)
+
+We need to learn a bit about programming.
+
+&lt;img src="../img/meme_honest.jpg" width="40%" /&gt;
+
+---
+## Disclaimer (bonus 2)
+
+Most statistical literature on LMM uses **R** (e.g., `lmer()` function of the `lme4` package)
+
+&lt;img src="../img/meme_lmer.jpg" width="40%" /&gt;
+
+---
+## Disclaimer (bonus 2)
+
+Many other programming languages support LMM
+
+* Python: `statsmodels` library, `Pymer4`
+* Matlab: `Statistics and Machine Learning Toolbox`
+* Julia: `MixedModels`
+* Stan: `Bayesian modelling`, with interfaces with R, Python and Matlab)
+
+I don't assume you are familiar with R, but I will use some R code for illustration purposes.
+
+---
+class: section, center, middle
+
+# Materials
+
+Some recommended reads.
+
+---
+### Materials: Books and book chapters
+
+.small[
+Navarro, D. J. (2015). Learning statistics with r: A tutorial for psychology students and other beginners.
+
+Field, A., Miles, J., &amp; Field, Z. (2012). 19. Multilevel linear models. In Discovering statistics using r. SAGE Publications.
+
+Winter, B. (2019). Statistics for linguists: An introduction using R. Routledge.
+
+Mirman, D. (2016). 4. Structuring random effects. In Growth curve analysis and visualisation using r. CRC press.
+
+Gelman, A., &amp; Hill, J. (2006). Data analysis using regression and multilevel/hierarchical models. Cambridge University press.
+
+Fox, J., &amp; Weisberg, S. (2018). An r companion to applied regression. SAGE publications.
+
+McElreath, R. (2020). Statistical rethinking: A bayesian course with examples in r and stan. CRC press.
+]
+
+---
+
+### Materials: Articles
+
+.small[
+Winter, B. (2013). Linear models and linear mixed effects models in R with linguistic applications. arXiv Preprint arXiv:1308.5499. https://arxiv.org/abs/1308.5499
+
+DeBruine, L., &amp; Barr, D. J. (2019). Understanding mixed effects models through data simulation. https://doi.org/10.31234/osf.io/xp5cy
+
+Barr, D. J., Levy, R., Scheepers, C., &amp; Tily, H. J. (2013). Random effects structure for confirmatory hypothesis testing: Keep it maximal. Journal of Memory and Language, 68(3), 255–278.
+
+Barr, D. J. (2013). Random effects structure for testing interactions in linear mixed-effects models. Frontiers in Psychology, 4, 328. https://www.frontiersin.org/articles/10.3389/fpsyg.2013.00328/full
+
+Bates, D., Kliegl, R., Vasishth, S., &amp; Baayen, H. (2015a). Parsimonious mixed models. arXiv Preprint arXiv:1506.04967. https://arxiv.org/pdf/1506.04967.pdf
+
+Baayen, R. H., Davidson, D. J., &amp; Bates, D. M. (2008). Mixed-effects modeling with crossed random effects for subjects and items. Journal of Memory and Language, 59(4), 390–412. https://doi.org/10.1016/j.jml.2007.12.005
+
+Barr, D. J. (2008). Analyzing “visual world” eyetracking data using multilevel logistic regression. Journal of Memory and Language, 59(4), 457–474. https://doi.org/10.1016/j.jml.2007.09.002
+
+]
+
+---
+
+### Materials: Articles (special mentions)
+
+.small[
+Meteyard, L., &amp; Davies, R. A. (2020). Best practice guidance for linear mixed-effects models in psychological science. Journal of Memory and Language, 112, 104092. https://doi.org/10.1016/j.jml.2020.104092
+
+Bates, D., Mächler, M., Bolker, B., &amp; Walker, S. (2015b). Fitting linear mixed-effects models using lme4. Journal of Statistial Software, 67(1). https://doi.org/10.18637/jss.v067.i01
+]
+
+---
+class: section, middle, center
+
+# Modelling
+
+A reminder.
+
+
+---
+## Modelling: What for?
+
+To estimate a **parameter** that characterises a population using data from samples of that population.
+
+This unknown **parameter** can be whatever we want:
+
+* Central tendency measures (e.g., mean, median)
+* Dispersion measures (e.g., standard deviation)
+* Measures of association between variables (e.g., coefficients)
+
+We usually estimate all of them when analysing data and perform some kind of **statistical inference** from them.
+
+
+---
+## Modelling: What for?
+
+In confirmatory analyses, we:
+
+1) Hypothesise that the parameter is within a range of values
+
+2) Collect data
+
+3) Perform statistical inference
+
+&lt;br&gt;
+
+* **Frequentist approach**: what is the probability of our data, assuming our hypothesis is true?
+* **Bayesian approach**: what is the probability of our hypothesis, given the data?
+
+---
+## Modelling: What for?
+
+In experimental confirmatory research, we are usually interesed in **estimating the association between two or more variables**:
+
+* *Age* (predictor) and *vocabulary size* (outcome)
+* *Bilingualism* (predictor) and *novelty preference* (outcome)
+* *Native linguistic rythmic class* (predictor) and *entrainment to speech signal* (outcome)
+
+We try draw a shape (e.g., line, curve) that defines this relationship.
+
+For now, we will stick to óne shape: **lines**.
+
+---
+## Modelling: What for
+
+The three (four, sometimes) steps of modelling:
+
+1) **Model especification**: what variables am I going to include in the model?
+
+2) **Model fitting**: what line fits data the best?
+
+3) **Statistical inference**: Does my model fit data good enough? What is the contribution of each predictor to the goodness of fit?
+
+4) (Bonus track) **Model validation**: Does my model predict new outcomes correctly?
+
+---
+## Modelling: 1) Model especification
+
+We need to define what **outcomes** and **predictors** I am interested in.
+
+&gt; e.g., what am I trying to predict? What variables am I using to predict it?
+
+What are my **assumptions** about how they relate to the outcome?
+
+&gt; e.g., linearity, normality of residuals
+
+What are my assumptions about **how each predictor relates to the other predictors**?+
+
+&gt; e.g., do I expect interactions between predictors?
+
+---
+## Modelling: 1) Model especification
+
+We will work with **linear** models
+
+This means that we will try to draw a **line** that defines the relationship between predictors and outcome.
+
+But bear in mind that **non-linear models** exist as well
+
+For instance, we may need/want to fit a **curve** or an **exponential** function
+
+&gt; e.g., Growth Curve Analysis
+
+---
+## Modelling: 1) Model especification
+
+Every line is defined by the following equation, named the **General Linear Model (GLM)**:
+
+$$
+Y = \beta_0+\beta_j \times X + \varepsilon
+$$
+
+Where:
+
+* `\(Y\)` is the value that the outcome variable takes (we know this value)
+* `\(\beta_0\)` is the intercept
+* `\(\beta_j\)` is the coefficient
+* `\(X_j\)` is the value that the predictor `\(X\)` takes (we know this value)
+* `\(\varepsilon\)`: residual (error the model makes)
+
+---
+class: center
+
+## Modelling: 1) Model especification
+
+$$
+Y = \beta_0+\beta_1 \times X
+$$
+
+This formula underlies most statistical techinques we use normally:
+
+&lt;img src="../img/meme_glm.jpg" width="25%" /&gt;
+
+---
+class: center
+
+## Modelling: 1) Model especification
+
+Most of them are generalised or special cases of the the **GLM**.
+
+.centered[
+[![](../img/linear_models.png)](https://lindeloev.github.io/tests-as-linear/)
+]
+
+---
+## Modelling: 1) Model specification
+
+We can extend the GLM to include more predictors:
+
+$$
+Y = \beta_0 + \beta_1 X_1 + \beta_2 X_2 + ... +  \beta_j  X_j
+$$
+
+Each coefficient (e.g., `\(\beta_1\)`, `\(\beta_2\)`) will contribute to the model by "adjusting" the line.
+
+But how much should each coefficient contribute?
+
+We need to take a look at the data.
+
+---
+## Modelling: 2) Model fitting
+
+There are infinite lines we can draw with these parameters.
+
+$$
+Y = \beta_0 + \beta_1 X_1 + \beta_2 X_2 + ... +  \beta_j \times X_j
+$$
+
+We need to find the combination of values of the coefficients `\(\beta_0\)` and `\(\beta_j\)` that make the line fit data the best.
+
+We need to find the **Least Squares Regression Line**
+
+This line **minimises the overall distance between the lines and the data points**
+
+How to find it? We use built-in **algorithms** that try a lot of combinations until finding the optimal one.
+
+---
+class: center
+
+## Modelling: 2) Model fitting
+
+Play with regression lines:
+
+https://antoinesoetewey.shinyapps.io/statistics-202/
+
+---
+## Modelling: 3) Statistical inference
+
+We have obtained **coefficients** that define the slope and position of the line that fits data the best.
+
+But **"best"** is relative.
+
+Even the best model could be fitting the data very badly
+
+We need to assess how wuch of the variance our model accounts for.
+
+Compute compute some measure of goodness of fit
+
+&gt; e.g., `\(R^2\)`: proportion of variance accounted for the model
+
+If the model shows nice fit, let's smove on to **interpret the coefficients**!
+
+---
+## Modelling: 3) Statistical inference
+
+We have a bunch of **coefficients**
+
+Each coefficient tells us **how much each predictor contributes to the slope** of the line
+
+All coefficients contribute to some degree. `\(\beta_j = 0\)` is almost impossible.
+
+**What coefficients contribute significantly?**
+
+---
+## Modelling: 3) Statistical inference
+
+Imagine that the **true (population) value of coefficient** `\(\beta_1\)` is 0
+
+This means that it has **no predictive value** regarding the outcome variable
+
+How what is the probability of `\(\beta_1\)` taking the value it takes in our sample, **assuming that `\(\beta_1 = 0\)`** is true? 
+
+If it is very **unlikely**, we should **reject** the assumption that `\(\beta_1 = 0\)`
+
+If its **likely enough**, we **don't reject** the assumption that `\(\beta_1 = 0\)`
+
+---
+## Modelling: 3) Statistical inference
+
+How can we know the **likelihood of our coefficient**?
+
+We need to map it onto a **probability distribution**.
+
+A probability distribution tells us the probability of each value a variable can take.
+
+Different variables can follow different distributions:
+
+* Gaussian (aka. normal, aka. exponential)
+* Student's *t*
+* Snedecor's *F*
+* Poisson
+* ...
+
+---
+## Modelling: 3) Statistical inference
+
+We know that **coefficients** in linear models tend to follow a **Gaussian distribution**. This distribution is known.
+
+It tells us the **probability** of each value of our coefficient, **assuming that its true value is 0**.
+
+---
+## Modelling: 3) Statistical inference
+
+
+
+&lt;img src="../img/distribution.png" width="100%" /&gt;
+
+---
+## Modelling: 3) Statistical inference
+
+We can map the probability of our coefficient onto this distribution to find its **associated probability**
+
+If the probability is lower than our **significance threshold** (e.g., `\(\alpha = .05\)`), we **reject the hypothesis** that the true value of the coefficient is 0!
+
+We **interpret** the model goodness of fit, the coefficients, and draw (or do not draw) conclusions from them.
+
+---
+## Modelling: Assumptions!
+
+We assume many things, one of the, being that observations are independent from each other.
+
+This means that the **probability** of one observation taking one value is independent from the value other observations have taken.
+
+&lt;img src="../img/balls.jpg" width="30%" /&gt;
+
+
+---
+class: section, center, middle
+
+# Introducing random effects in our linear model
+
+---
+## What is a LMM
+
+An extension of the GLM that allows to account for systematic sources of variability beyond our effects of interest.
+
+All models are unnacurate to some degree.
+
+Sometimes, part of the error the model makes is systematic.
+
+---
+## Why to use a LMM
+
+* To **avoid aggregating data** (more statistical power)
+* To account for **non-independence** of scores
+* To account for **hierarchical structures** in our data
+* To account for **cross-observational** unit variability
+
+---
+## Why to use a LMM
+
+Effect of word frequency on reaction time task in a lexical decision task.
+
+* Word condition:
+- High frequency: **CAR** &gt; Yes/No
+- Low frequency: **FLAG** &gt; Yes/No
+* Non-word condition: **FOIR** &gt; Yes/No
+
+Does *frequency* affect *reaction times* (*RT*)?
+
+---
+## Why to use a LMM
+
+
+
+Trial-wise data:
+
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:center;"&gt; Participant &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt; Trial &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt; Frequency &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt; RT &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:center;"&gt; Participant 1 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; High &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.24 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:center;"&gt; Participant 1 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 2 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; High &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.34 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:center;"&gt; Participant 1 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 3 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; High &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.12 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:center;"&gt; Participant 1 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 4 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; High &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.34 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:center;"&gt; Participant 1 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 5 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; High &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.04 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:center;"&gt; Participant 1 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 6 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; Low &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.47 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:center;"&gt; Participant 1 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 7 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; Low &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.36 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:center;"&gt; Participant 1 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 8 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; Low &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.18 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:center;"&gt; Participant 1 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 9 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; Low &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.61 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:center;"&gt; Participant 1 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 10 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; Low &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.23 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+...
+
+---
+## Why to use a LMM
+
+Data-points from all participants are pooled together:
+
+&lt;img src="../img/task_plot_fix.png" width="100%" /&gt;
+
+---
+## Why to use a LMM
+
+Assumption of non-indenpendence is had to assume here.
+
+&lt;img src="../img/task_plot_fix_points.png" width="100%" /&gt;
+
+---
+## Why to use a LMM
+
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:center;"&gt; Participant &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt; Condition &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt; RT (s) &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:center;"&gt; Participant 1 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; High &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.22 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:center;"&gt; Participant 1 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; Low &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.37 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:center;"&gt; Participant 2 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; High &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.27 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:center;"&gt; Participant 2 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; Low &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 1.01 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:center;"&gt; Participant 3 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; High &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.47 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:center;"&gt; Participant 3 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; Low &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 1.71 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:center;"&gt; Participant 4 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; High &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.89 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:center;"&gt; Participant 4 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; Low &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 2.43 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:center;"&gt; Participant 5 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; High &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 1.52 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:center;"&gt; Participant 5 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; Low &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 3.40 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+---
+## Why to use a LMM
+
+&lt;img src="../img/task_plot_fix_agg.png" width="100%" /&gt;
+
+---
+## Why to use a LMM
+
+There is another way of dealing with no independence and *not* losing data.
+
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:center;"&gt; Participant &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt; Trial &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt; Condition &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt; RT (s) &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:center;"&gt; Participant 1 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; High &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.24 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:center;"&gt; Participant 1 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 2 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; High &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.34 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:center;"&gt; Participant 1 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 3 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; High &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.12 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:center;"&gt; Participant 1 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 4 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; High &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.34 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:center;"&gt; Participant 1 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 5 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; High &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.04 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:center;"&gt; Participant 1 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 6 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; Low &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.47 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:center;"&gt; Participant 1 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 7 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; Low &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.36 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:center;"&gt; Participant 1 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 8 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; Low &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.18 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:center;"&gt; Participant 1 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 9 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; Low &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.61 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:center;"&gt; Participant 1 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 10 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; Low &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.23 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+---
+## Why to use a LMM
+
+&lt;img src="../img/task_plot_int.png" width="100%" /&gt;
+
+---
+## Why to use a LMM
+
+&lt;img src="../img/task_plot_slo.png" width="100%" /&gt;
+
+
+---
+class: section, middle, center
+
+# A real-life example
+
+---
+## How to use a LMM
+
+Does previous experience with the Head-turn Preference Procedure (HPP) impact performance in the task?
+
+.citation[
+Santolin, C., García-Castro, G., Zettersten, M., Sebastian-Galles, N., &amp; Saffran, J. (2020, March 4). Experience with research paradigms relates to infants' direction of preference. https://doi.org/10.31234/osf.io/xgvbh
+]
+
+You can find data and code here: https://osf.io/g95ub/
+
+---
+## How to use a LMM
+
+An example using real data:
+
+.citation[
+Santolin, C., García-Castro, G., Zettersten, M., Sebastian-Galles, N., &amp; Saffran, J. (2020, March 4). Experience with research paradigms relates to infants' direction of preference. https://doi.org/10.31234/osf.io/xgvbh
+]
+
+Does previous experience with the Head-turn Preference Procedure (HPP) impact performance in the task?
+
+---
+## The Head-turn Preference Procedure
+
+Infants can't tell us whether they **discriminate** between stimuli.
+
+Nor can they be instructed in an experimental task.
+
+We use their **preferential looking** behaviour (how long infants turn their head towards the source of stimulation).
+
+---
+## The Head-turn Preference Procedure
+
+1) We **familiarise** infants with one set of stimuli.
+
+2) In each **test** trial, infants are presented with one token from the familiar set, or from the un familiar set. 
+
+If infants **look systematically** longer to one set of stimuli than to others, it means that they are able to **discriminate** between them.
+
+&lt;img src="../img/setup.png" width="40%" /&gt;
+
+---
+### The data
+
+We gathered data from **6 experiments** run two different locations:
+
+* Laboratori de Recerca en Infància (Universitat Pompeu Fabra, Barcelona)
+* Waisman Center &amp; Department of Psychology (University of Wisconsin-Madinson, Wisconsin)
+
+All experiments were **broadly similar** in design, age of participants, and stimuli type.
+
+---
+### The data
+
+However, there were some **differences**:
+
+* Each experiment included different participants
+* Participants lived in different countries (i.e., different cultures, lifestyle)
+* Partcipants were exposed to different languages
+* Participants had different language profile (monolinguals in Wisconsin, bilinguals in Barcelona)
+
+---
+### The data
+
+
+`flip_data &lt;- read.csv("flip_data.csv")`
+
+
+|Study                                       |HPP 1th |HPP 2nd |HPP 3th |HPP 4th |HPP 5th |HPP 6th |
+|:-------------------------------------------|:-------|:-------|:-------|:-------|:-------|:-------|
+|Saffran &amp; Wilson (2003)                     |26      |24      |24      |4       |2       |-       |
+|Saffran et al. (2008)                       |4       |10      |4       |4       |-       |2       |
+|Santolin &amp; Saffran (2019)                   |18      |30      |-       |4       |-       |-       |
+|Santolin, Saffran &amp; Sebastian-Galles (2019) |44      |4       |-       |-       |-       |-       |
+
+
+---
+### The data
+
+Long vs. wide format data.
+
+
+| Participant |                    Study                    | HPP | Item | Looking Time (ms) |
+|:-----------:|:-------------------------------------------:|:---:|:----:|:-----------------:|
+|  baby50996  | Santolin, Saffran &amp; Sebastian-Galles (2019) |  1  |  0   |      6541.00      |
+|  baby50996  | Santolin, Saffran &amp; Sebastian-Galles (2019) |  1  |  1   |      4770.83      |
+|  baby51010  | Santolin, Saffran &amp; Sebastian-Galles (2019) |  1  |  0   |      7654.67      |
+|  baby51010  | Santolin, Saffran &amp; Sebastian-Galles (2019) |  1  |  1   |      6785.17      |
+|  baby51274  | Santolin, Saffran &amp; Sebastian-Galles (2019) |  1  |  0   |      3580.25      |
+|  baby51274  | Santolin, Saffran &amp; Sebastian-Galles (2019) |  1  |  1   |      4501.50      |
+
+---
+
+
+| Participant |                    Study                    | HPP | Familiar LT (ms) | Novel LT (ms) |
+|:-----------:|:-------------------------------------------:|:---:|:----------------:|:-------------:|
+|  baby50996  | Santolin, Saffran &amp; Sebastian-Galles (2019) |  1  |     6541.00      |    4770.83    |
+|  baby51010  | Santolin, Saffran &amp; Sebastian-Galles (2019) |  1  |     7654.67      |    6785.17    |
+|  baby51274  | Santolin, Saffran &amp; Sebastian-Galles (2019) |  1  |     3580.25      |    4501.50    |
+|  baby51689  | Santolin, Saffran &amp; Sebastian-Galles (2019) |  1  |     7520.67      |    5052.83    |
+|  baby52110  | Santolin, Saffran &amp; Sebastian-Galles (2019) |  1  |     8974.83      |   11885.67    |
+|  baby53657  | Santolin, Saffran &amp; Sebastian-Galles (2019) |  1  |     9755.17      |    5585.33    |
+
+???
+
+Difference between wide and long format data
+
+---
+### Preparing our predictors
+
+We use `Looking time` (in ms) as the **outcome**
+
+We will use `Item` (familiar/novel) and number of previous `HPP` (numeric, 1-6) as predictors
+
+We expect an `HPP` by `Item` **interaction**
+
+&gt; Previous experience with HPP should impact novel and familiar preference differently.
+
+
+---
+### Preparing our predictors
+
+Coding variables: **dumy** vs. **effect** coding.
+
+Model fitting functions like `lmer` don't care about how you call your **factor levels**.
+
+It assigns a **numeric value** to each level.
+
+In our case, *Familiar* = 0 and *Novel* = 1 (alphabetical order).
+
+
+---
+### Preparing our predictors
+
+How you code your variables changes the **information** the model provides you.
+
+This type of coding (0s and 1s) is named ***dumy coding***.
+
+If *Familiar* =  0, and *Novel* = 1:
+
+* **Model intercept**: Looking time when item is familiar.
+* **Model slopes**: Change in looking time when item is novel.
+
+
+---
+### Preparing our predictors
+
+We are interested in **interpreting changes in *novelty* preference**. Familiar trials should be the baseline.
+
+The default coding happens to suit us.
+
+But we should should always **explicitely recode our predictors** based on what information we want them to provide.
+
+`flip &lt;- mutate(flip_recorded, Item = ifelse(Item=="Familiar", 0, 1))`
+
+
+---
+### Preparing our predictors
+
+Dummy coding `Item` makes sense because we have a **clear baseline**.
+
+Alternatively, we could have *effect-coded* the predictor `Item`.
+
+*Familiar* = -0.5, *Novel* = 0.5
+
+In this case, the **intercept** (the looking time when `Item` = 0) would inform us about the **average looking time across conditions**.
+
+How we have coded our variables impacts our conclusions especially when interpreting intercepts and main effects if we include interactions in our model.
+
+.footer[We'll come back to this later.]
+
+---
+### Only fixed effects: Model fitting
+
+**General Linear Model**:
+
+`$$Y = \beta_0 + \beta_1X_1 + \beta_2X_2 + ... + \beta_jX_j + \varepsilon$$`
+
+For participant `\(i\)` and condition `\(j\)`
+
+Fixed effects: 
+
+`$$LookingTime_{ij} = \beta_0 + \beta_1Item + \beta_2HPP + \beta_3Item \times HPP + \varepsilon_{ij}$$`
+
+---
+### Only fixed effects: Model fitting
+
+Implementing our model in R:
+
+```
+model_fixed &lt;- lm(formula = LookingTime ~ Item*HPP, data = flip_data)
+```
+
+
+---
+### Only fixed effects: Statistical inference
+
+Let's take a closer look at the estimates of the model:
+
+```
+summary_fixed &lt;- summary(model_fixed)
+summary_fixed$coefficients
+```
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt; Coefficient &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt; SE &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt; t &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt; p &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; (Intercept) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 8013.475 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 490.447 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 16.339 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.000 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Item &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; -1398.775 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 693.597 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; -2.017 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.045 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; HPP &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; -603.079 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 229.702 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; -2.625 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.009 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Item:HPP &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 667.113 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 324.848 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 2.054 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.041 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+---
+### Only fixed effects: Model interpretation
+
+&lt;img src="../img/flip_fixed.png" width="100%" /&gt;
+
+---
+### Introducing random effects
+
+Our data is **hierarchical**:
+
+* Every participant provides two **data points**: one for familiar items and one for novel items.
+* There are strong reasons to consider that **data points from the same participant are correlated**.
+
+&gt; Some infants are **long lookers**: high looking times in both conditions
+&gt; Some infants are **short lookers**: low looking times in both conditions
+
+We should add **random intercepts** by participant.
+
+---
+### Random intercepts: Model especification
+
+**Fixed effects**: 
+
+Previously: `$$LookingTime_{ij} = \beta_0 + \beta_1Item + \beta_2HPP + \beta_3Item \times HPP + \varepsilon_{ij}$$`
+
+**Fixed effects and random intercepts**:
+
+`$$LookingTime_{ij} = \beta_0 + P_{0i} + \beta_1Item + \beta_2HPP + \beta_3Item \times HPP + \varepsilon_{ij}$$`
+
+Where `\(P_{0i}\)` is the intercept of participant `\(i\)`
+
+
+---
+### Random intercepts by participant: Model fitting
+
+
+```r
+library(lme4)
+model_random &lt;- lmer(formula = LookingTime ~ Item*HPP +
+                       (1 | Participant), data = flip_data)
+```
+
+---
+### Random intercepts by participant: Statistical inference
+
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt; Coefficient &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt; SE &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt; t &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; (Intercept) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 8013.48 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 490.45 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 16.34 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Item &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; -1398.77 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 411.32 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; -3.40 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; HPP &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; -603.08 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 229.70 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; -2.63 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Item:HPP &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 667.11 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 192.64 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 3.46 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+Where are my ***p*-values**? I want my *p*-values :(
+
+---
+### Random intercepts: Statistical inference
+
+Computing *p*-values in LMM is *not straightfoward*.
+
+It's difficult to come map estimates into **probability distributions**.
+
+Not clear how to pool parameters (many models have been run).
+
+---
+### Random intercepts by participant: Statistical inference
+
+Several alternatives:
+
+1) Assume estimated coefficients follow a **normal distribution**: map estandardised coefficients onto the normal distribution (*Mean* = 0, *SD* = 1) to get their probability.
+
+2) Assume estimated coefficients follow a ***t*** or a ***F* distribution*** with *approximated* degrees of freedom:
+
+* *t* distribution: **Satterthwaite**'s approximation to degrees of freedom
+* `\(\chi^2\)` distribution: **Wald**'s `\(\chi^2\)` test
+* *F* distribution: **Kenward-Roger** ANOVA
+
+3) Shift to **Bayesian** statistical inference :)
+
+---
+
+&lt;img src="../img/meme_bayes.jpg" width="40%" /&gt;
+
+---
+### Random intercepts by participant: Statistical inference
+
+```
+library(car)
+Anova(model_random, type = "III", test.statistic = "F")
+```
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt; F &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt; Df &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt; Df den. &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt; p &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; (Intercept) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 266.967 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 140.814 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.000 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Item &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 11.565 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 100.000 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.001 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; HPP &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 6.893 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 140.814 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.010 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Item:HPP &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 11.992 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 100.000 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.001 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+---
+
+### Random effects by participant: Model interpretation
+
+&lt;img src="../img/flip_inter.png" width="50%" /&gt;
+
+---
+### Introducing random slopes
+
+* There are also reasons to think that the **effect** of `Item` varies across infants.
+* Long-lookers may be show **higher preferences** than others
+
+&gt; Some infants may discriminate better than others between familiar and novel items
+
+The slope of `Item` may vary across infants.
+
+---
+### Random intercepts and item slopes by participants: Model especification
+
+Previously: `$$LookingTime_ij = \beta_0 + P_{0i} + \beta_1Item + \beta_2HPP + \beta_3Item \times HPP + \varepsilon_{ij}$$`
+
+Where `\(P_{0i}\)` is the **intercept** of participant `\(i\)`
+
+`$$LookingTime_{ij} = \beta_0 + P_{0i} + (\beta_1 + P_{1i})Item+ \beta_2HPP + \beta_3Item \times HPP + \varepsilon_{ij}$$`
+
+Where `\(P_{1i}\)` is the **slope** of `Item` for participant `\(i\)`
+
+---
+### Random intercepts and item slopes by participants: Model fitting
+
+
+```r
+model_random_slopes &lt;- lmer(formula = LookingTime ~ Item*HPP + (1 + Item*HPP | Participant),
+                            data = flip_data)
+```
+
+```
+## Error: number of observations (=204) &lt;= number of random effects (=408) for term (1 + Item * HPP | Participant); the random-effects parameters and the residual variance (or scale parameter) are probably unidentifiable
+```
+
+Problem: there are a lot of parameters to estimate, and not enough variability.
+
+May be related to some levels of HPP just having one participant.
+
+Check this [link](https://stackoverflow.com/questions/19713228/lmer-error-grouping-factor-must-be-number-of-observations) out.
+
+---
+### Random intercepts and item slopes by participants: Model fitting
+
+We can (somehow irresponsibly) force the model to go on.
+
+
+```r
+model_random_slopes &lt;- lmer(formula = LookingTime ~ Item*HPP + (1 + Item*HPP | Participant),
+                            data = flip_data,
+                            control = lmerControl(check.nobs.vs.nRE = "ignore"))
+```
+
+The model fails to converge (i.e., can't find the most likely coefficients given the data).
+
+
+---
+
+&lt;img src="../img/meme_convergence2.png" width="50%" /&gt;
+
+---
+### Random intercepts and item slopes by participants: Model fitting
+
+So, including `Item` random slopes by participant seems like a bad idea.
+
+Let's stick to by-participants **random intercepts** only.
+
+But haven't finished getting fancy!
+
+---
+### Adding a second random effect
+
+Our data is missing an important source of **correlation between data points**: `Study`
+
+Participants are more **similar within study** than between study.
+
+We can account for this new source of variation by adding `Study` as a **random effect**.
+
+---
+### Random intercepts by participant and by study: Model especification
+
+Fixed effects and random intercepts by participant:
+
+Previously: `$$LookingTime_ij = \beta_0 + P_{0i} + \beta_1Item + \beta_2HPP + \beta_3Item \times HPP + \varepsilon_{ij}$$`
+
+Where `\(P_{0i}\)` is the **intercept** of participant `\(i\)`
+
+`$$LookingTime_{ij} = \beta_0 + P_{0i} + S_{0k} + \beta_1Item + \beta_2HPP + \beta_3Item \times HPP + \varepsilon_{ij}$$`
+
+Where `\(P_{0i}\)` is the **intercept** of participant `\(i\)` and `\(S_{0k}\)` is the **intercept** of study `\(k\)`.
+
+---
+### Random intercepts and item slopes by participants and by study: Model fitting
+
+
+```r
+model_random_intercepts2 &lt;- lmer(formula = LookingTime ~ Item*HPP + (1 | Participant) + (1 | Study),
+                                 data = flip_data)
+```
+
+---
+### Random intercepts by participant and by study: Statistical inference
+
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt; F &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt; Df &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt; Df den. &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt; p &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; (Intercept) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 124.638 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 9.060 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.000 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Item &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 11.565 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 100.000 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.001 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; HPP &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 4.800 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 133.117 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.030 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Item:HPP &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 11.992 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 100.000 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.001 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+---
+### Random intercepts by participant and by study: Model interpretation
+
+&lt;img src="../img/flip_slopes.png" width="50%" /&gt;
+
+---
+### Introducing random slopes by study
+
+Finally, we can also expect the effect of `HPP` to vary **across studies**.
+
+Infants in some studies could have been **more sensitive** to the effect of previous experience with HPP.
+
+---
+### Random intercepts by participant and study, and random `Item` slopes by study: Model especification
+
+Previously: `$$LookingTime_ij = \beta_0 + P_{0i} + S_{0k} + \beta_1Item + \beta_2HPP + \beta_3Item \times HPP + \varepsilon_{ij}$$`
+
+Where `\(P_{0i}\)` is the **intercept** of participant `\(i\)` and `\(S_{0k}\)` is the **intercept** of study `\(k\)`.
+
+`$$LookingTime_{ij} = \beta_0 + P_{0i} + (\beta_1 + S_{1k})Item+ \beta_2HPP + \beta_3Item \times HPP + \varepsilon_{ij}$$`
+
+Where `\(P_{0i}\)` is the **intercept** of participant `\(i\)`, `\(S_{0k}\)` is the **intercept** of study `\(k\)`, and `\(S_{1k}\)` is the **slope** of `Item` on study `k`.
+
+---
+### Random intercepts by participant and study, and random `HPP` slopes by study: Model fitting
+
+
+```r
+model_random_slope2 &lt;- lmer(formula = LookingTime ~ Item*HPP + (1 | Participant) + (1 + HPP | Study),
+                            data = flip_data)
+```
+
+---
+### Random intercepts by participant and study, and random `Item` slopes by study: Statistical inference
+
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; F &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Df &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Df den. &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; p &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; (Intercept) &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 77.738 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3.156 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.003 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Item &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 11.565 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 100.000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.001 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; HPP &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2.918 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2.620 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.199 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Item:HPP &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 11.992 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 100.000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.001 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+
+---
+### Random intercepts by participant and study, and random `Item` slopes by study: Model interpretation
+
+&lt;img src="../img/flip_slopes2.png" width="100%" /&gt;
+
+---
+### Random intercepts by participant and study, and random `Item` slopes by study: Model interpretation
+
+However, we missed something in the `lmer` output...
+
+&lt;img src="../img/meme_singular.jpg" width="50%" /&gt;
+
+---
+### Random intercepts by participant and study, and random `HPP` slopes by study: Model interpretation
+
+Our fit is singular! But what does this mean? It has to do with something we haven't talked about yet.
+
+Random intercepts and slopes are not the only different thing about LMMs.
+
+There is an additional parameter we haven't talked about yet:
+
+[*Dark deep voice*]: The **correlation** parameter, `\(\rho\)`.
+
+---
+### (Parenthesis: Introducing the correlation parameter)
+
+LMMs allow intercepts to vary across observational units.
+
+&gt; Each participant has her own intercept
+
+The amount of **variation across intercepts** impacts how fixed effects are estimated, and how we perform inferences from them.
+
+The intercept **standard deviation**, `\(\sigma\)` reflects this variability.
+
+Same goes for **random slopes**.
+
+
+---
+### (Parenthesis: Introducing the correlation parameter)
+
+For each random effect (i.e., study), random intercepts and slopes may vary together:
+
+They may be **correlated**.
+
+&gt; Participants that were **slower** in our lexical decission task may be **more sensitive** to the frequency manipulation.
+
+---
+&lt;img src="../img/task_plot_slo.png" width="100%" /&gt;
+
+
+---
+### (Parenthesis: Introducing the correlation parameter)
+
+&gt; Studies where participants looked longer on average may be those where participants discriminated better between familiar and novel trials.
+
+&lt;img src="../img/flip_slopes2.png" width="50%" /&gt;
+
+---
+### (Parenthesis: Introducing the correlation parameter)
+
+Together with `\(\sigma\)`, `\(\rho\)` is calculated for a given random effect, both intercepts and slopes are especified.
+
+These parameters are accessible from the `lmer` output, in the for of a matrix:
+
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; Term &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; SD1 &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; SD2 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Cov. &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Correlation &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Participant &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; (Intercept) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; - &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3116294.67 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1765.30 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Study &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; (Intercept) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; - &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1607461.98 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1267.86 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Study &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; HPP &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; - &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 32828.32 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 181.19 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Study &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; (Intercept) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; HPP &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -229717.82 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -1.00 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Residual &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; - &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; - &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1991854.67 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1411.33 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+---
+### (Parenthesis: Introducing the correlation parameter)
+
+The **variance-covariance matrix** is **singular**.
+
+Correlation parameter is near 1 and/or SD are close to 0.
+
+Our model is **overparameterised**.
+
+We should be asking a bit less from the data.
+
+We should make our model more **parsimonious** (Bates et al., 2015).
+
+**Simplify** the random effects structure.
+
+More about failure to converge and singular fit later...
+
+---
+### Our final model:
+
+Includes:
+
+* Main effects of `Item` and `HPP`
+* `Item` `\(\times\)` `HPP` interaction
+* Crossed random effects for participants and study (in contrast to nested random effects; more about this later)
+- Random by-participant intercepts
+- Random by-study intercepts
+
+---
+### Our final model:
+
+Accounts for:
+
+* The **fixed effect** of `Item` on looking times.
+* The **fixed effect** of `HPP` on looking times.
+* The **differential effect** of `HPP` on each test `Item` (interaction).
+* **Cross-participant variability** in overall looking time.
+* **Cross-study variability** in overall looking time.
+* **Hierarchical structure** of our data
+
+---
+### Our final model:
+
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; F &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Df &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Df.res &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Pr(&amp;gt;F) &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; (Intercept) &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 266.967 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 140.814 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.000 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Item &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 11.565 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 100.000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.001 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; HPP &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.893 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 140.814 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.010 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Item:HPP &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 11.992 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 100.000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.001 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+
+
+---
+### Random intercepts by participant: Statistical inference
+
+&lt;img src="../img/flip_coefs.png" width="50%" /&gt;
+
+---
+class: section, center, middle
+
+# Some additional points
+
+---
+## Power analysis in Mixed Models
+
+LMM involved the estimation of many parameters.
+
+To perform power analysis, we need to fix some of these parameters
+
+It's difficult to come up with **sensible parameters** *a priori*
+
+* How much variability am I expecting for each random effect?
+* How much correlation am I expecting between random efects?
+
+---
+## Power analysis in Mixed Models
+
+Also, estimating power analytically (mapping expected parameters onto known distributions) is not straightforward in LMM.
+
+It's not quite clear what parameters we are referring to.
+
+Alternative: shift to simulation-based power analysis. Already available for non-mixed models (e.g., ANOVA). See Lakens and Caldwell ([2019](https://psyarxiv.com/baxsf/)) and it's accompanying R package, `ANOVApower`.
+
+Some methods are already available for mixed-models:
+
+* Zhang and Wang ([2009](https://link.springer.com/article/10.3758/BRM.41.4.1083)): Includes non-linear models, but it's implemented in commercial software (SAS)
+* DeBruine and Barr (2019)
+
+---
+## When our model fails to converge
+
+Sometimes, our model can't figure out **what parameters are most likely** given the data.
+
+This can be because **different values** of the same coefficient are **equally likely**.
+
+How to avoid this:
+
+* The **larger** the data, the easier to converge.
+* The larger values of the coefficients the more difficult to converge. Consider:
+- Changing units of measurement: use **seconds** instead of milliseconds (Barr, 2008).
+- **Standardising** your predictors.
+* Don't get too fancy with your model: the more **parsimonious**, the better (less parameters to estimate).
+
+---
+## When our model is overly complex: singular fit
+
+See Bates et al. (2015)
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false,
+"ratio": "16:9"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

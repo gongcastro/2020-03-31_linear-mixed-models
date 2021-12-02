@@ -1,0 +1,11 @@
+"participant"	"freq"	"rt"
+"Participant 1"	"High"	0.215354788372427
+"Participant 1"	"Low"	0.368778661274166
+"Participant 2"	"High"	0.273191646839351
+"Participant 2"	"Low"	1.00565415183656
+"Participant 3"	"High"	0.465392171765816
+"Participant 3"	"Low"	1.71366383622798
+"Participant 4"	"High"	0.892810354392547
+"Participant 4"	"Low"	2.42711501012893
+"Participant 5"	"High"	1.5191492956022
+"Participant 5"	"Low"	3.40480788065484

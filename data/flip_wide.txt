@@ -1,0 +1,5 @@
+"Study"	"1"	"2"	"3"	"4"	"5"	"6"
+"Saffran & Wilson (2003)"	13	12	12	2	1	-
+"Saffran et al. (2008)"	2	5	2	2	-	1
+"Santolin & Saffran (2019)"	9	15	-	2	-	-
+"Santolin, Saffran & Sebastian-Galles (2019)"	22	2	-	-	-	-
